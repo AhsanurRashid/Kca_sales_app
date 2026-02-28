@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 
 const publicRoutes = ['/']
-const protectedRoutes = ['/app', '/products', '/sales-order', '/order-list', '/credit-note', '/credit-note-list', '/payment', '/collection-list']
+const protectedRoutes = ['/app', '/products', '/sales-order', '/order-list', '/credit-note', '/credit-note-list', '/payment', '/collection-list', '/location-tracker']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -22,5 +22,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/app/:path*', '/products/:path*', '/sales-order/:path*', '/order-list/:path*', '/credit-note/:path*', '/credit-note-list/:path*', '/payment/:path*', '/collection-list/:path*'],
+  matcher: ['/', '/app/:path*', '/products/:path*', '/sales-order/:path*', '/order-list/:path*', '/credit-note/:path*', '/credit-note-list/:path*', '/payment/:path*', '/collection-list/:path*', '/location-tracker/:path*'],
 }

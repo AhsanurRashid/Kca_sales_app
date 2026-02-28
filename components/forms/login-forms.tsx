@@ -14,7 +14,7 @@ import {
   FieldGroup,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { CheckCircle, XCircle, Loader2, Eye, EyeOff } from "lucide-react"
 
 import { IActionResponse, loginFormSchema } from "@/lib/schema"
 import { loginAction } from "@/app/actions/login-action"
@@ -23,6 +23,8 @@ import { useUserStore } from "@/store/user-store"
 import { useRouter } from "next/navigation"
 
 const LoginForm = () => {
+
+  //test
   const router = useRouter()
   const { setUser } = useUserStore()
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -34,6 +36,7 @@ const LoginForm = () => {
   })
 
   const { isSubmitting } = form.formState
+  const [showPassword, setShowPassword] = React.useState(false)
 
   async function onSubmit(data: z.infer<typeof loginFormSchema>) {
     const formData = new FormData()
@@ -116,15 +119,26 @@ const LoginForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <Input
-                    {...field}
-                    id="login-password"
-                    type="password"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Password"
-                    disabled={isSubmitting}
-                    className="h-14 rounded-2xl bg-white/10 dark:bg-white/5 border border-white/20 text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/40 focus:ring-0 transition-all"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Password"
+                      disabled={isSubmitting}
+                      className="h-14 rounded-2xl bg-white/10 dark:bg-white/5 border border-white/20 text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/40 focus:ring-0 transition-all pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="size-5 text-white/10" /> : <Eye className="size-5 text-white/10" />}
+                    </button>
+                  </div>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

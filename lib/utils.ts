@@ -101,5 +101,10 @@ export const menus =  {
       href: "/collection-list", 
       icon: "Wallet"
     },
+    {
+      name: "Location Tracker", 
+      href: "/location-tracker", 
+      icon: "MapPin"
+    }
   ],
 }
