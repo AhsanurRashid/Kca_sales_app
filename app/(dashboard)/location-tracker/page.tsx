@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { MapPin, Navigation, StopCircle, RefreshCw, Clock, Gauge } from "lucide-react"
+import { sendLocationData } from "@/app/actions/send-location-action"
 
 interface LocationData {
   latitude: number
@@ -18,7 +19,12 @@ const LocationTrackerPage = () => {
   const [isTracking, setIsTracking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<LocationData[]>([])
+  const [sendCount, setSendCount] = useState(0)
+  const [lastSendStatus, setLastSendStatus] = useState<"idle" | "success" | "error">("idle")
+  const [lastSendTime, setLastSendTime] = useState<string | null>(null)
   const watchIdRef = useRef<number | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const locationRef = useRef<LocationData | null>(null)
 
   const startTracking = () => {
     if (!navigator.geolocation) {
@@ -40,6 +46,7 @@ const LocationTrackerPage = () => {
           timestamp: position.timestamp,
         }
         setLocation(data)
+        locationRef.current = data
         setHistory((prev) => [data, ...prev].slice(0, 20))
       },
       (err) => {
@@ -48,12 +55,34 @@ const LocationTrackerPage = () => {
       },
       { enableHighAccuracy: true, maximumAge: 0 }
     )
+
+    // Send location every 500ms
+    intervalRef.current = setInterval(() => {
+      if (locationRef.current) {
+        sendLocationData({
+          lat: locationRef.current.latitude,
+          lng: locationRef.current.longitude,
+        }).then((res) => {
+          setSendCount((c) => c + 1)
+          setLastSendTime(new Date().toLocaleTimeString())
+          setLastSendStatus(res.success ? "success" : "error")
+        }).catch(() => {
+          setSendCount((c) => c + 1)
+          setLastSendTime(new Date().toLocaleTimeString())
+          setLastSendStatus("error")
+        })
+      }
+    }, 500)
   }
 
   const stopTracking = () => {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current)
       watchIdRef.current = null
+    }
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
     setIsTracking(false)
   }
@@ -62,6 +91,9 @@ const LocationTrackerPage = () => {
     return () => {
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current)
+      }
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current)
       }
     }
   }, [])
@@ -107,6 +139,19 @@ const LocationTrackerPage = () => {
         <span className="text-muted-foreground">
           {isTracking ? "Live tracking active" : "Tracking stopped"}
         </span>
+      </div>
+
+      {/* Send status debug panel */}
+      <div className="flex items-center gap-4 bg-card border rounded-lg px-4 py-2 text-sm">
+        <span className="text-muted-foreground font-medium">API Send Status</span>
+        <span className={`flex items-center gap-1 font-mono font-semibold ${lastSendStatus === "success" ? "text-green-500" : lastSendStatus === "error" ? "text-destructive" : "text-muted-foreground"}`}>
+          <span className={`w-2 h-2 rounded-full ${lastSendStatus === "success" ? "bg-green-500" : lastSendStatus === "error" ? "bg-destructive" : "bg-muted-foreground"}`} />
+          {lastSendStatus === "idle" ? "Not sent yet" : lastSendStatus === "success" ? "Success" : "Error"}
+        </span>
+        <span className="text-muted-foreground">Sends: <span className="text-foreground font-mono font-bold">{sendCount}</span></span>
+        {lastSendTime && (
+          <span className="text-muted-foreground">Last: <span className="text-foreground font-mono">{lastSendTime}</span></span>
+        )}
       </div>
 
       {/* Error */}
