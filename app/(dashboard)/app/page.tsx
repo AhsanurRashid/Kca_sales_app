@@ -9,6 +9,7 @@ import {
   CreditCard,
   Wallet,
   LucideIcon,
+  MapPin
 } from "lucide-react"
 
 const iconMap: Record<string, LucideIcon> = {
@@ -19,6 +20,7 @@ const iconMap: Record<string, LucideIcon> = {
   Files,
   CreditCard,
   Wallet,
+  MapPin
 }
 
 const HomePage = () => {
