@@ -136,7 +136,7 @@ const LoginForm = () => {
                       tabIndex={-1}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? <EyeOff className="size-5 text-gray-600" /> : <Eye className="size-5 text-gray-600" />}
+                      {showPassword ? <EyeOff className="size-5 text-white/10" /> : <Eye className="size-5 text-white/10" />}
                     </button>
                   </div>
                   {fieldState.invalid && (

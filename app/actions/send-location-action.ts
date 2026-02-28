@@ -8,7 +8,7 @@ export interface ILocationPayload {
 }
 
 export async function sendLocationData(payload: ILocationPayload) {
-    const loggedInUser = decodeURIComponent((await cookies()).get('full_name')?.value || 'Unknown User')
+    const loggedInUser = decodeURIComponent((await cookies()).get('full_name')?.value || 'logout user')
     const dataToSend = {
         ...payload,
         userName: loggedInUser
@@ -22,8 +22,6 @@ export async function sendLocationData(payload: ILocationPayload) {
             },
             body: JSON.stringify(dataToSend),
         })
-
-        console.log('Location response:', response)
 
         if (!response.ok) {
             throw new Error(`Failed to send location data: ${response.statusText}`)

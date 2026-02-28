@@ -2,6 +2,7 @@
 
 import { logoutAction } from "@/app/actions/logout-action"
 import { useUserStore } from "@/store/user-store"
+import { useLocationTrackerStore } from "@/store/location-tracker-store"
 import { useRouter } from "next/navigation"
 import { User, LogOut } from "lucide-react"
 import {
@@ -18,9 +19,13 @@ import { getInitials } from "@/lib/utils"
 
 const Profile = () => {
   const { user, setUser, isHydrated } = useUserStore()
+  const { stopTracking } = useLocationTrackerStore()
   const router = useRouter()
 
   const handleLogout = async () => {
+    // Stop location tracking immediately before logout
+    stopTracking()
+
     const result = await logoutAction()
     if (result.success) {
       setUser(null)
